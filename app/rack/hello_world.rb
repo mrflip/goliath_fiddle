@@ -9,7 +9,7 @@ class HelloWorld < Goliath::API
 
   def response(env)
     logger.info "Hello, world"
-    [200, {'X-Goliath' => 'Hello-World'}, '{"result":"Hello there, world"}']
+    [200, {'X-Goliath-Responder' => self.class.to_s}, '{"result":"Hello there, world"}']
   end
 end
 
