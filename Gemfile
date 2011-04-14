@@ -1,14 +1,19 @@
 source "http://rubygems.org"
-# Add dependencies required to use your gem here.
-# Example:
-#   gem "activesupport", ">= 2.3.5"
 
-# Add dependencies to develop your gem here.
-# Include everything needed to run rake, tests, features, etc.
+gem "goliath", "~>0.9.1"
+gem 'em-synchrony'
+gem 'em-http-request'
+
+group :console do
+  gem "wirble"
+  gem "looksee"
+  gem "awesome_print"
+end
+
 group :development do
-  gem "rspec", "~> 2.3.0"
-  gem "yard", "~> 0.6.0"
-  gem "bundler", "~> 1.0.0"
-  gem "jeweler", "~> 1.5.2"
+  gem "bundler", "~> 1.0"
+  gem "rspec", "~> 2.5"
+  gem "yard", "~> 0.6"
+  gem "jeweler", "~> 1.5"
   gem "rcov", ">= 0"
 end

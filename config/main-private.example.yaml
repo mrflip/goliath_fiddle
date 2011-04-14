@@ -1,0 +1,18 @@
+#
+# Private settings -- DO NOT check this into your repo.
+# copy this file to @config/main-private.yaml@ and then enter your keys, etc.
+#
+
+defaults: &defaults
+  :infochimps_apikey:   YOUR KEY HERE
+  :session_secret:      nowisthetimeforallgoodmentocometotheaidoftheirbieber
+  :google_api_key:      
+
+production:
+  <<: *defaults
+  
+development:
+  <<: *defaults
+  
+staging:
+  <<: *defaults  

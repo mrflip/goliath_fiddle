@@ -1,0 +1,20 @@
+#
+# General settings -- check this into your repo.
+# For private settings, copy @config/main-private.example.yaml@ to
+# @config/main-private.yaml@ and enter your keys, etc.
+#
+
+defaults: &defaults
+  :app_name:            Tweeple Fight! Go!
+  :logging:             false
+
+production:
+  <<: *defaults
+  
+development:
+  <<: *defaults
+  :logging:             true
+  
+staging:
+  <<: *defaults  
+  :logging:             true

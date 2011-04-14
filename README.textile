@@ -1,8 +1,29 @@
-= goliath_doodads
+h1. goliath_doodads
 
-Description goes here.
+This is a series of simple examples using "Goliath,":http://goliath.io a fast asynchronous ruby API frameworks
 
-== Contributing to goliath_doodads
+h2. Examples
+
+* *Hello, world*:
+* */
+
+
+
+h2. Install
+
+<pre>
+    gem install em-http-request --pre
+    gem install em-synchrony --pre
+
+    ruby github.rb -sv -p 9000
+    Starting server on 0.0.0.0:9000 in development mode. Watch out for stones.
+
+    curl -vv "localhost:9000/?query=ruby"
+<pre>
+
+h2. Colophon
+
+h3. Contributing to goliath_doodads
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
@@ -12,7 +33,7 @@ Description goes here.
 * Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
 * Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
 
-== Copyright
+h3. Copyright
 
 Copyright (c) 2011 Infochimps. See LICENSE.txt for
 further details.
