@@ -1,3 +1,11 @@
+
+module Goliath
+  HTTP_ERROR_CODES = HTTP_STATUS_CODES.select{|code,msg| code >= 400 && code <= 599 }
+  HTTP_ERROR_CODES.each do |code, msg|
+    Goliath::Validation.const_set msg.gsub(/\W+/, '')+'Error', Goliath::Validation::Error.new(code, msg)
+  end
+end
+
 module Goliath
   module Rack
 
@@ -24,13 +32,13 @@ module Goliath
     #   end
     # end
     
-
-
-    
     # 
     # If a _force_response_code param is included in the request, the
     # ForceResponseCode middleware will force the response code to the given
     # value no matter what happens downstream
+    #
+    # Note: this does no sanity checking on the code you specify, other than
+    # forcing it to be > 0.
     #
     class ForceResponseCode #  < Goliath::Rack::PostProcessor
 
@@ -39,7 +47,8 @@ module Goliath
       end
 
       def call(env)
-        p ['async.callback', env['async.callback']]
+        return @app.call(env) if env.params['_force_response_code'].to_i == 0
+        raise Goliath::Validation::BadRequestError if env.params['_force_response_code'].to_i < 0
         
         async_cb = env['async.callback']
 
@@ -51,10 +60,7 @@ module Goliath
       end
       
       def frp_post_process(env, status, headers, body)
-        p ['frp_post_process', env.params['_force_response_code'], status, headers, body]
-        if env.params['_force_response_code'] && status.to_i > 0
-          status = env.params['_force_response_code'].to_i
-        end
+        status = env.params['_force_response_code'].to_i
         [status, headers, body]
       end
     end
