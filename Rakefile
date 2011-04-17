@@ -20,13 +20,14 @@ Jeweler::Tasks.new do |gem|
   gem.email = "coders@infochimps.org"
   gem.authors = ["Infochimps"]
 
-  gem.add_runtime_dependency     'goliath', "~> 0.9.1"
+  gem.add_runtime_dependency     'goliath',   "~> 0.9.1"
+  gem.add_runtime_dependency     'yajl-ruby', "~> 0.8.2"
 
-  gem.add_development_dependency 'bundler', "~> 1.0.0"
-  gem.add_development_dependency 'rspec',   "~> 2.3.0"
-  gem.add_development_dependency 'yard',    "~> 0.6.0"
-  gem.add_development_dependency 'jeweler', "~> 1.5.2"
-  gem.add_development_dependency 'rcov',    ">= 0"
+  gem.add_development_dependency 'bundler',   "~> 1.0.12"
+  gem.add_development_dependency 'rspec',     "~> 2.5.0"
+  gem.add_development_dependency 'yard',      "~> 0.6.7"
+  gem.add_development_dependency 'jeweler',   "~> 1.5.2"
+  gem.add_development_dependency 'rcov',      ">= 0"
 end
 Jeweler::RubygemsDotOrgTasks.new
 

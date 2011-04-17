@@ -1,19 +1,14 @@
 source "http://rubygems.org"
 
-gem "goliath", "~>0.9.1"
-gem 'em-synchrony'
-gem 'em-http-request'
-
-group :console do
-  gem "wirble"
-  gem "looksee"
-  gem "awesome_print"
-end
+gem 'goliath',         :git => 'https://github.com/postrank-labs/goliath.git'
+gem 'em-synchrony',    :git => 'https://github.com/igrigorik/em-synchrony.git'
+gem 'em-http-request', :git => 'https://github.com/igrigorik/em-http-request.git'
+gem 'yajl-ruby',       "~> 0.8.2"
 
 group :development do
-  gem "bundler", "~> 1.0"
-  gem "rspec", "~> 2.5"
-  gem "yard", "~> 0.6"
-  gem "jeweler", "~> 1.5"
-  gem "rcov", ">= 0"
+  gem 'bundler',       "~> 1.0.12"
+  gem 'rspec',         "~> 2.5.0"
+  gem 'yard',          "~> 0.6.7"
+  gem 'jeweler',       "~> 1.5.2"
+  gem 'rcov',          ">= 0"
 end
