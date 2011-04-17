@@ -1,13 +1,19 @@
-h1. goliath_doodads
+h1. goliath_fiddle
 
-This is a series of simple examples using "Goliath,":http://goliath.io a fast asynchronous ruby API frameworks
+This is a playground in which I wrap my brain around "Goliath,":http://goliath.io a fast asynchronous ruby API frameworks.
+
+Don't pay too much attention to it right now -- I'm figuring this stuff out so much of the code may be wrong or heavily accented.
 
 h2. Examples
 
-* *Hello, world*:
-* */
+* *Hello, world*:        -- says 'Hello, world'
 
-
+* *sleepy*
+  - sleepy.rb            -- uses em-synchrony
+  - sleepy_blocking.rb   -- does a blocking sleep, to demonstrate the wrong way to do it
+  - sleepy_streaming.rb  -- uses streaming response and a callback.
+  
+* *multi*                -- dispatches several concurrent requests against sleepy, aggregates their responses.
 
 h2. Install
 
@@ -23,7 +29,7 @@ h2. Install
 
 h2. Colophon
 
-h3. Contributing to goliath_doodads
+h3. Contributing to goliath_fiddle
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it

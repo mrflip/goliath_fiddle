@@ -12,7 +12,7 @@ require 'rake'
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "goliath_doodads"
+  gem.name = "goliath_fiddle"
   gem.homepage = "http://infochimps.com/labs"
   gem.license = "MIT"
   gem.summary = %Q{Experiments with the goliath (http://goliath.io) super-fast asynchronous ruby API framework}
