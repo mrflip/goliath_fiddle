@@ -1,35 +1,28 @@
-require 'logger'
 require 'goliath'
-require 'yajl/json_gem'
 
 #
-# This responder will wait a given amount of time before responding -- yet can
-# handle multiple parallel requests.
+# Wait the amount of time given by the 'delay' parameter before responding
+# Handles multiple parallel requests -- its EM::Synchrony call allows the
+# reactor to keep spinning.
 #
 class Sleepy < Goliath::API
   use Goliath::Rack::Params             # parse query & body params
-  # use Goliath::Rack::Formatters::JSON   # JSON output formatter
-  # use Goliath::Rack::Render             # auto-negotiate response format
-  # use Goliath::Rack::ValidationError    # catch and render validation errors
-  use ::Rack::Reloader, 0 if Goliath.dev?
-
-  # longest allowable delay
-  MAX_DELAY    = 5.0
+  use Goliath::Rack::Formatters::JSON   # JSON output formatter
+  use Goliath::Rack::Render             # auto-negotiate response format
+  use Goliath::Rack::ValidationError    # catch and render validation errors
+  use Goliath::Rack::Validation::NumericRange, {:key => 'delay', :max => 5.0, :default => 1.5, :as => Float}
 
   def response(env)
     start = Time.now.utc.to_f
-    delay = (env.params['delay'] || 1.0).to_f
-    delay = MAX_DELAY if delay > MAX_DELAY
-
+    delay = env.params['delay']
     env.logger.debug "timer #{start} [#{delay}]: start of response"
 
+    # EM::Synchrony call allows the reactor to keep spinning: HOORAY CONCURRENCY
     EM::Synchrony.sleep(delay)
+    body = { :start => start, :delay => delay, :actual => (Time.now.utc.to_f - start) }
 
-    env.logger.debug "timer #{start} [#{delay}]: after sleep"
-
-    now = Time.now.utc.to_f ; actual = now - start
-    body = '{"started":%f,"delay":%f,"actual":%f,"now":%f}' % [start, delay, actual, now]
-    [200, {'X-Goliath-Responder' => self.class.to_s, 'X-Sleepy-Delay' => delay.to_s }, body]
+    env.logger.debug "timer #{start} [#{delay}]: after sleep: #{body.inspect}"
+    [200, {'X-Responder' => self.class.to_s, 'X-Sleepy-Delay' => delay.to_s, }, body]
   end
 end
 

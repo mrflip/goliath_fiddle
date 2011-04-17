@@ -38,6 +38,6 @@ class SleepyBad1 < Goliath::API
       env.logger.debug "timer #{start} [#{delay}]: connection closed"
     end
     env.logger.debug "timer #{start} [#{delay}]: after"
-    [200, {'X-Goliath-Responder' => self.class.to_s, 'X-Sleepy-Delay' => delay.to_s }, Goliath::Response::STREAMING]
+    [200, {'X-Responder' => self.class.to_s, 'X-Sleepy-Delay' => delay.to_s }, Goliath::Response::STREAMING]
   end
 end

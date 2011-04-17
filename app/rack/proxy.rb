@@ -13,7 +13,7 @@ class Proxy < Goliath::API
     logger.info "Received #{gh.to_yaml}"
     logger.info "Received #{gh.response_header.status} from downstream: #{gh.response.class} #{gh.response.to_s}"
 
-    [200, {'X-Goliath-Responder' => self.class.to_s}, gh.response]
+    [200, {'X-Responder' => self.class.to_s}, gh.response]
   end
 end
 

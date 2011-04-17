@@ -1,10 +1,8 @@
 require 'logger'
 require 'goliath'
+
 require 'yajl/json_gem'
-
 require 'em-synchrony/em-http'
-
-require 'yaml'
 
 #
 # This responder will wait a given amount of time before responding -- yet can
@@ -43,6 +41,6 @@ class Multi < Goliath::API
 
     now = Time.now.utc.to_f ; actual = now - start
     body = results.merge(:started => start, :actual => actual, :now => now).to_yaml + "\n"
-    [200, {'X-Goliath-Responder' => self.class.to_s }, body]
+    [200, {'X-Responder' => self.class.to_s }, body]
   end
 end

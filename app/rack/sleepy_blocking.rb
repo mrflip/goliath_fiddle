@@ -1,31 +1,26 @@
-require 'logger'
 require 'goliath'
-require 'yajl/json_gem'
 
 #
-# This responder will wait a given amount of time before responding, but cannot
-# handle multiple parallel requests.
+# Wait the amount of time given by the 'delay' parameter before responding.
+# Cannot handle multiple parallel requests -- its sleep call blocks the reactor, the WRONG thing for a goliath endpoint
 #
 class SleepyBlocking < Goliath::API
   use Goliath::Rack::Params             # parse query & body params
-  use ::Rack::Reloader, 0 if Goliath.dev?
-
-  # longest allowable delay
-  MAX_DELAY    = 5.0
+  use Goliath::Rack::Formatters::JSON   # JSON output formatter
+  use Goliath::Rack::Render             # auto-negotiate response format
+  use Goliath::Rack::ValidationError    # catch and render validation errors
+  use Goliath::Rack::Validation::NumericRange, {:key => 'delay', :max => 5.0, :default => 1.5, :as => Float}
 
   def response(env)
-    p env
     start = Time.now.utc.to_f
+    delay = env.params['delay']
+    env.logger.debug "timer #{start} [#{delay}]: start of response"
 
-    delay = (env.params['delay'] || 1.0).to_f
-    delay = MAX_DELAY if delay > MAX_DELAY
-    env.logger.debug "timer #{start} [#{delay}]: before"
+    # This call call **blocks the reactor**, the **WRONG** thing for a goliath endpoint
     sleep delay
+    body = { :start => start, :delay => delay, :actual => (Time.now.utc.to_f - start) }
 
-    now = Time.now.utc.to_f ; actual = now - start
-    body = { :started => start, :delayed => delay, :actual => actual, :now => now }.to_json
-
-    env.logger.debug "timer #{start} [#{delay}]: after (#{body})"
-    [200, {'X-Goliath-Responder' => self.class.to_s, 'X-Sleepy-Delay' => delay.to_s, 'X-Z' => '1' }, body]
+    env.logger.debug "timer #{start} [#{delay}]: after sleep: #{body.inspect}"
+    [200, {'X-Responder' => self.class.to_s, 'X-Sleepy-Delay' => delay.to_s, }, body]
   end
 end
