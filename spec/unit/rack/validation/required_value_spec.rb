@@ -1,0 +1,1 @@
+../../../../vendor/goliath/spec/unit/rack/validation/required_value_spec.rb

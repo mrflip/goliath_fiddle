@@ -1,0 +1,1 @@
+../../vendor/goliath/spec/integration/valid_spec.rb

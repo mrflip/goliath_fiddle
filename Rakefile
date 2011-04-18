@@ -19,15 +19,30 @@ Jeweler::Tasks.new do |gem|
   gem.description = %Q{Experiments with the goliath (http://goliath.io) super-fast asynchronous ruby API framework}
   gem.email = "coders@infochimps.org"
   gem.authors = ["Infochimps"]
+  gem.required_ruby_version = ">= 1.9.2"
 
-  gem.add_runtime_dependency     'goliath',   "~> 0.9.1"
-  gem.add_runtime_dependency     'yajl-ruby', "~> 0.8.2"
+  gem.add_dependency             'goliath',         "~> 0.9.1"
+  gem.add_dependency             'em-http-request', ">= 1.0.0.beta.1"
+  gem.add_dependency             'yajl-ruby',       "~> 0.8.2"
 
-  gem.add_development_dependency 'bundler',   "~> 1.0.12"
-  gem.add_development_dependency 'rspec',     "~> 2.5.0"
-  gem.add_development_dependency 'yard',      "~> 0.6.7"
-  gem.add_development_dependency 'jeweler',   "~> 1.5.2"
-  gem.add_development_dependency 'rcov',      ">= 0"
+  gem.add_development_dependency 'bundler',         "~> 1.0.12"
+  gem.add_development_dependency 'rspec',           "~> 2.5.0"
+  gem.add_development_dependency 'yard',            "~> 0.6.7"
+  gem.add_development_dependency 'jeweler',         "~> 1.5.2"
+  gem.add_development_dependency 'rcov',            ">= 0"
+
+  gem.add_development_dependency 'spork'
+  gem.add_development_dependency 'nokogiri'
+  gem.add_development_dependency 'bluecloth'
+  gem.add_development_dependency 'rack-rewrite'
+  gem.add_development_dependency 'multipart_body'
+  gem.add_development_dependency 'em-mongo'
+  gem.add_development_dependency 'amqp',            ">=0.7.1"
+
+  gem.files = `git ls-files`.split("\n")
+  gem.test_files = `git ls-files -- spec/*`.split("\n")
+  gem.require_paths = ['lib']
+
 end
 Jeweler::RubygemsDotOrgTasks.new
 

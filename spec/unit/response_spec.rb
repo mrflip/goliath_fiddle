@@ -1,0 +1,1 @@
+../../vendor/goliath/spec/unit/response_spec.rb

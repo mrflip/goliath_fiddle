@@ -1,0 +1,1 @@
+../../../../vendor/goliath/spec/unit/rack/formatters/xml_spec.rb

@@ -1,0 +1,1 @@
+../../vendor/goliath/spec/integration/echo_spec.rb

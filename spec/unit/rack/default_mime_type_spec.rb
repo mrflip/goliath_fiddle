@@ -1,0 +1,1 @@
+../../../vendor/goliath/spec/unit/rack/default_mime_type_spec.rb

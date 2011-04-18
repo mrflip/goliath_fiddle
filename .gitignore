@@ -53,3 +53,4 @@ vendor/gems
 vendor/bin
 .bundle
 .sass-cache
+vendor/goliath

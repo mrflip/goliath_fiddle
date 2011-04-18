@@ -1,0 +1,1 @@
+../../vendor/goliath/spec/integration/empty_body_spec.rb

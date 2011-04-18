@@ -1,0 +1,1 @@
+../../vendor/goliath/spec/integration/async_request_processing.rb

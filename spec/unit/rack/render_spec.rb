@@ -1,0 +1,1 @@
+../../../vendor/goliath/spec/unit/rack/render_spec.rb

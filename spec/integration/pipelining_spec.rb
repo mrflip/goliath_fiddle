@@ -1,0 +1,1 @@
+../../vendor/goliath/spec/integration/pipelining_spec.rb

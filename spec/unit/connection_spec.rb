@@ -1,0 +1,1 @@
+../../vendor/goliath/spec/unit/connection_spec.rb

@@ -27,6 +27,10 @@ h2. Install
     curl -vv "localhost:9000/?query=ruby"
 <pre>
 
+h2. Running specs
+
+You need to link @vendor/goliath@ to a goliath install for the specs to run.
+
 h2. Colophon
 
 h3. Contributing to goliath_fiddle
