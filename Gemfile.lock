@@ -17,7 +17,7 @@ GIT
 
 GIT
   remote: https://github.com/infochimps/goliath.git
-  revision: 57c5ae143c8cb3310682edd87546ae8cd885e024
+  revision: f484d2f10d422e3c9a15bfd9515caca3f8869be5
   specs:
     goliath (0.9.1)
       async-rack
@@ -50,6 +50,7 @@ GEM
       eventmachine
     eventmachine (1.0.0.beta.3)
     git (1.2.5)
+    gorillib (0.0.4)
     http_parser.rb (0.5.1)
     jeweler (1.5.2)
       bundler (~> 1.0.0)
@@ -60,6 +61,7 @@ GEM
     multipart_body (0.2.1)
     nokogiri (1.4.4)
     rack (1.2.2)
+    rack-abstract-format (0.9.9)
     rack-accept-media-types (0.9)
     rack-contrib (1.1.0)
       rack (>= 0.9.1)
@@ -91,9 +93,12 @@ DEPENDENCIES
   em-mongo
   em-synchrony!
   goliath!
+  gorillib (~> 0.0.4)
   jeweler (~> 1.5.2)
   multipart_body
   nokogiri
+  rack-abstract-format
+  rack-respond_to
   rack-rewrite
   rcov
   rspec (~> 2.5.0)
