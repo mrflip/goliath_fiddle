@@ -3,9 +3,6 @@ require 'spork'
 require 'bundler'
 $:<< '../lib' << 'lib' << 'vendor/goliath/lib'
 
-p Dir['vendor/goliath/lib/*']
-
-
 Spork.prefork do
   Bundler.setup
   Bundler.require

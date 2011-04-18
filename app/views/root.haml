@@ -6,4 +6,12 @@
 
 
 %ul
+  - ENDPOINTS.each do |route, info|
+    %li
+      - link_to(info[:handler], route)
+      &mdash;
+      = info[:description]
+
+%pre= ENDPOINTS
+%pre
   

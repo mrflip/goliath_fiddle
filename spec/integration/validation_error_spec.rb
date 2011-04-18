@@ -1,10 +1,12 @@
 require 'spec_helper'
-require 'yajl'
+require 'yajl/json_gem'
 require 'goliath'
 
-class ValidRaisesJson < Goliath::API
+require 'goliath/rack/validation_error_as_json'
+
+class ValidationErrorSpec < Goliath::API
   use Goliath::Rack::Params
-  use Goliath::Rack::ValidationError, :force_json => true
+  use Goliath::Rack::ValidationErrorAsJson
   use Goliath::Rack::Validation::RequiredParam, {:key => 'test'}
 
   def response(env)
@@ -12,11 +14,11 @@ class ValidRaisesJson < Goliath::API
   end
 end
 
-describe ValidRaisesJson do
+describe ValidationErrorSpec do
   let(:err) { Proc.new { fail "API request failed" } }
 
   it 'returns JSON with :force_json option' do
-    with_api(ValidRaisesJson) do
+    with_api(ValidationErrorSpec) do
       get_request({}, err) do |c|
         c.response.should == '{"error":"Test identifier missing"}'
       end
