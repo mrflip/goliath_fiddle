@@ -16,8 +16,8 @@ GIT
       eventmachine (>= 1.0.0.beta.1)
 
 GIT
-  remote: https://github.com/postrank-labs/goliath.git
-  revision: f392f43f674767d23b4e62545c4f15baa486f1dc
+  remote: https://github.com/infochimps/goliath.git
+  revision: 57c5ae143c8cb3310682edd87546ae8cd885e024
   specs:
     goliath (0.9.1)
       async-rack

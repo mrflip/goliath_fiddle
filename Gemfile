@@ -1,6 +1,6 @@
 source "http://rubygems.org"
 
-gem 'goliath',         :git => 'https://github.com/postrank-labs/goliath.git'
+gem 'goliath',         :git => 'https://github.com/infochimps/goliath.git'
 gem 'em-synchrony',    :git => 'https://github.com/igrigorik/em-synchrony.git'
 gem 'em-http-request', :git => 'https://github.com/igrigorik/em-http-request.git'
 gem 'yajl-ruby',       "~> 0.8.2"
