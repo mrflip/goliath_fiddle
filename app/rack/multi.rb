@@ -10,9 +10,8 @@ require 'em-synchrony/em-http'
 #
 class Multi < Goliath::API
   use Goliath::Rack::Params             # parse query & body params
-  use ::Rack::Reloader, 0 if Goliath.dev?
 
-  TARGET_URL_BASE = "http://localhost:9000"
+  TARGET_URL_BASE = "http://localhost:9002/meta/http/sleepy.json"
 
   def response(env)
     start = Time.now.utc.to_f
@@ -20,10 +19,10 @@ class Multi < Goliath::API
     env.logger.debug "timer #{start}: start of response"
 
     multi = EM::Synchrony::Multi.new
-    multi.add :page1, EM::HttpRequest.new("#{TARGET_URL_BASE}/?delay=2.0").aget
-    multi.add :page2, EM::HttpRequest.new("#{TARGET_URL_BASE}/?delay=1.0").aget
-    multi.add :page3, EM::HttpRequest.new("#{TARGET_URL_BASE}/?delay=3.0").aget
-    multi.add :page4, EM::HttpRequest.new("#{TARGET_URL_BASE}/?delay=1.0").aget
+    multi.add :page1, EM::HttpRequest.new("#{TARGET_URL_BASE}?delay=2.0").aget
+    multi.add :page2, EM::HttpRequest.new("#{TARGET_URL_BASE}?delay=1.0").aget
+    multi.add :page3, EM::HttpRequest.new("#{TARGET_URL_BASE}?delay=3.0").aget
+    multi.add :page4, EM::HttpRequest.new("#{TARGET_URL_BASE}?delay=1.0").aget
 
     env.logger.debug "timer #{start}: before perform"
     data = multi.perform
@@ -40,7 +39,7 @@ class Multi < Goliath::API
     env.logger.debug "timer #{start}: after fetch"
 
     now = Time.now.utc.to_f ; actual = now - start
-    body = results.merge(:started => start, :actual => actual, :now => now).to_yaml + "\n"
+    body = results.merge(:started => start, :actual => actual, :now => now)
     [200, {'X-Responder' => self.class.to_s }, body]
   end
 end

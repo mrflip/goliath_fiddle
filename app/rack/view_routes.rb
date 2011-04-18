@@ -6,6 +6,9 @@ require 'goliath/rack/validation_error_as_json'
 require 'goliath/validation/standard_http_errors'
 require 'rack/abstract_format'
 require 'yajl/json_gem'
+
+require 'goliath/rack/formatters/yaml'
+
 #
 require 'gorillib'
 require 'gorillib/string/inflections'
@@ -43,10 +46,12 @@ class ViewRoutes < Goliath::API
   use Goliath::Rack::StaticFiles, :cache_age => 36000 # serve static files from /public
   use Goliath::Rack::Formatters::JSON   # JSON output formatter
   use Goliath::Rack::Formatters::XML    # JSON output formatter
+  use Goliath::Rack::Formatters::YAML    # JSON output formatter
   use Goliath::Rack::Render                           # auto-negotiate response format
   use Rack::AbstractFormat
   # use Goliath::Rack::ValidationErrorAsJson            # catch errors and respond with appropriate response code.
 
+  use Goliath::Rack::Validation::NumericRange, {:key => 'delay', :max => 5.0, :default => 1.5, :as => Float}
 
   map '/' do
     run RootView.new

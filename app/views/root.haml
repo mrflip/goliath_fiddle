@@ -8,7 +8,7 @@
 %ul
   - ENDPOINTS.each do |route, info|
     %li
-      - link_to(info[:handler], route)
+      - link_to(info[:handler], "#{route}.json")
       &mdash;
       = info[:description]
 
