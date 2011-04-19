@@ -4,12 +4,9 @@
 # http://en.wikipedia.org/wiki/Chunked_transfer_encoding
 # http://developers.sun.com/mobility/midp/questions/chunking/
 # http://blog.port80software.com/2006/11/08/
-
+#
 module Goliath
-
-  module Response
-    STREAMING_HEADERS = { 'Transfer-Encoding' => 'chunked', }
-  end
+  ::Goliath::Response::STREAMING_HEADERS = { 'Transfer-Encoding' => 'chunked', }
   
   class ChunkedStreamingAPI < Goliath::API
     CRLF = "\r\n"
