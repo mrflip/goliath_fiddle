@@ -13,7 +13,6 @@
 require 'goliath'
 
 class Every < Goliath::API
-  use ::Rack::Reloader, 0 if Goliath.dev?
 
   def on_close(env)
     env.logger.info "Connection closed."
