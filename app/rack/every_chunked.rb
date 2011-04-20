@@ -25,7 +25,7 @@ class EveryChunked < Goliath::ChunkedStreamingAPI
     end
     
     headers = { 'Content-Type' => 'text/plain', 'X-Responder' => self.class.to_s }
-    [200, Goliath::Response::STREAMING_HEADERS.merge(headers), Goliath::Response::STREAMING]
+    [200, STREAMING_HEADERS.merge(headers), STREAMING]
   end
 
   def on_close(env)
