@@ -27,7 +27,6 @@ protected
 
   # Bone-simple html page.
   # @param text [String] body of page. No escaping or anything else is done.
-  # @option options [Hash]   :head      Tag + content pairs to stuff in head
   # @option options [String] :head_text raw content to stuff in head
   # @option options [String] :foot_text raw content to stuff at end of body
   def html_page text, options = {}
