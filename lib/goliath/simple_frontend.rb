@@ -32,7 +32,6 @@ protected
   # @option options [String] :foot_text raw content to stuff at end of body
   def html_page text, options = {}
     page = ["<html><head>"]
-    (options[:head] || {}).each{|k,v| page << "<#{k}>#{v}</#{k}>"}
     page << options[:head_text]
     page << "</head><body>"
     page << text
