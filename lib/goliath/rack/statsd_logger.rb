@@ -1,34 +1,10 @@
 #!/usr/bin/env ruby
+$: << File.dirname(__FILE__)+'/../../../vendor/goliath/lib'
+$: << File.dirname(__FILE__)+'/../../../lib'
+
 require 'goliath'
+require 'goliath/plugins/statsd_logger'
 require 'gorillib/logger/log'
-
-module Goliath
-  module Rack
-
-    #
-    # A middleware that performs post-processing
-    #
-    class PostProcessor
-      def initialize(app)
-        @app = app
-      end
-
-      def call(env)
-        async_cb = env['async.callback']
-
-        env['async.callback'] = Proc.new do |status, headers, body|
-          async_cb.call(post_process(env, status, headers, body))
-        end
-        status, headers, body = @app.call(env)
-        post_process(env, status, headers, body)
-      end
-
-      def post_process(env, status, headers, body)
-        [status, headers, body]
-      end
-    end
-  end
-end
 
 # Counting: gorets:1|c       # Add 1 to the "gorets" bucket. It stays in memory until the flush interval
 # Timing:   glork:320|ms     # The glork took 320ms to complete this time. StatsD figures out 90th percentile, average (mean), lower and upper bounds for the flush interval.
@@ -36,97 +12,50 @@ end
 
 module Goliath
   module Rack
-    class StatsdRequestLogger < Goliath::Rack::PostProcessor
-      DEFAULT_HOST = 'localhost'
-      DEFAULT_PORT = 8125
+    class StatsdRequestLogger
+      include Goliath::Rack::AsyncMiddleware
 
-      def initialize app, name, options={}
+      def initialize app, name
         @name = name
-        @host = options[:host] || DEFAULT_HOST
-        @port = options[:port] || DEFAULT_PORT
-
-        p [app, name, options, @name, @host, @port]
-        super app
-      end
-
-      def statsd
-        @statsd ||= StatsdSender.open(@host)
+        super(app)
       end
 
       def call(env)
-        p [statsd]
-
-        statsd.count [:req_beg, route(env)]
+        agent.count [@name, :req, route(env)]
         super(env)
       end
 
-      def route(env)
-        env['PATH_INFO'].gsub(%r{^/}, '').gsub(%r{/}, '.')
-      end
-
       def post_process(env, status, headers, body)
-        return super if status == -1
-        statsd.count [:req_end, route(env)]
-        statsd.count [:status, status, route(env)]
-        statsd.timing([:req_time, route(env)], (1000 * (Time.now.to_f - env[:start_time].to_f)))
+        agent.timing [@name, :req_time, route(env)], (1000 * (Time.now.to_f - env[:start_time].to_f))
+        agent.timing [@name, :req_time, status],     (1000 * (Time.now.to_f - env[:start_time].to_f))
         [status, headers, body]
       end
 
-      # def requests_per_second
-      # end
-      #
-      # def average_latency
-      # end
+      def agent
+        Goliath::Plugin::StatsdLogger.agent
+      end
+
+      def route(env)
+        path = env['PATH_INFO'].gsub(%r{^/}, '')
+        return 'root' if path == ''
+        path.gsub(%r{/}, '.')
+      end
     end
   end
 end
-
-class StatsdSender < EventMachine::Connection
-  DEFAULT_HOST = '127.0.0.1'
-  DEFAULT_PORT = 8125
-  DEFAULT_FRAC = 1.0
-
-  def initialize options={}
-    @name = options[:name] || 'foo'              # File.basename(Goliath::Application.app_file, '.rb')
-    @host = options[:host] || DEFAULT_HOST
-    @port = options[:port] || DEFAULT_PORT
-
-    p ['init', @name, @host, @port]
-  end
-
-  def name metric=[]
-    [@name, metric].flatten.compact.join(".")
-  end
-
-  def count metric, val=1, sampling_frac=nil
-    # p ['count', @name, @host, @port, metric, val, sampling_frac]
-    if sampling_frac && (rand < sampling_frac.to_F)
-      send_to_statsd "#{name(metric)}:#{val}|c|@#{sampling_frac}"
-    else
-      send_to_statsd "#{name(metric)}:#{val}|c"
-    end
-  end
-
-  def timing metric, val
-    send_to_statsd "#{name(metric)}:#{val}|ms"
-  end
-
-protected
-
-  def send_to_statsd metric
-    send_datagram metric, @host, @port
-  end
-
-  def self.open host
-    EventMachine::open_datagram_socket(host, 0, self)
-  end
-end
-
 
 class StatsdLogger < Goliath::API
-  use Goliath::Rack::StatsdRequestLogger, :bob
+  use    Goliath::Rack::StatsdRequestLogger, :bob
+  plugin Goliath::Plugin::StatsdLogger
 
   def response(env)
-    [200, {}, "hello world"]
+    delay = 1.0
+
+    case
+    when env['PATH_INFO'] == '/sleepy' then EM::Synchrony.sleep(delay)
+    end
+
+    body = { :start => env[:start_time], :delay => delay, :actual => (Time.now.utc.to_f - env[:start_time]) }
+    [200, {'X-Responder' => self.class.to_s, 'X-Sleepy-Delay' => delay.to_s, }, body]
   end
 end

@@ -1,0 +1,104 @@
+h1. Brocephalus
+
+Brocephalus is a fabric for routing metrics and facts through your organization.
+
+* *Metrics*: Any system anywhere can throw a namespaced, timestamped numeric quantity at Brocephalus. These metrics can report on status ('there are 3 cups of coffee remaining'), timing ('this response took 100ms'), or counting ('I just served a 404 response code').
+
+* *Facts*: Any system anywhere can throw an arbitrary namespaced, timestamped JSON hash at Brocephalus. (We call this 'facts' in contrast to 'logging' to emphasize that this is _structured_ data with _unstructured_ semantics).
+
+h3. Design goals
+
+* *Decentralized*:      Any system anywhere can dispatch facts or metrics using an arbitrary namespace and schema. Nothing needs to be created in advance.
+* *Bulletproof*:        Clients will never fail because of network loss or timeout.
+* *Fast*:               UDP clients are non-blocking and happily dispatch thousands of requests per second.
+* *High Throughput*:    Brocephalus on a t1.micro should outpace Graphite on an m1.small and Mongo on an m1.large.
+* *Minimal Dependency*: Ruby clients can dispatch or query using nothing outside of the standard libraries. 
+* *Ubiquitous*:         A shell script can send a simple basket of facts in < 3 lines.
+
+Not design goals:
+
+* *Reliable delivery*:  If the network or datastore fails, Brocephalus will drop packets on the floor. However, it will report metrics to show this is happening.
+* *Storage*:            Brocephalus is designed to be friends with Graphite and MongoDB (and pluggable for others). It doesn't do anything but aggregation and routing, though.
+* *Analysis*:           ditto.
+* *Graphing*:           ditto.
+
+
+h2. Design
+
+h3. Network layer
+
+Brocephalus accepts input via:
+
+* UDP  -- UDP is connectionless, so it's fire-and-forget. As Etsy puts it,
+
+  bq. So, why do we use UDP to send data to StatsD? Well, it’s fast — you don’t want to slow your application down in order to track its performance — but also sending a UDP packet is fire-and-forget. Either StatsD gets the data, or it doesn’t. The application doesn’t care if StatsD is up, down, or on fire; it simply trusts that things will work. If they don’t, our stats go a bit wonky, but the site stays up. Because we also worship at the Church of Uptime, this is quite alright. (The Church of Graphs makes sure we graph UDP packet receipt failures though, which the kernel usefully provides.)
+
+  However, UDP (though bone-simple) is somewhat arcane; and since the packet size of a UDP datagram is limited, Brocephalus can't accept large Facts via UDP.
+  
+* HTTP -- HTTP is ubiquitous, and allows for security, load-balancing and so forth. It's connectionful (which is good and bad) and it's heavier-weight enough that you'll want to stick with UDP at the thousands-per-second case.
+
+h3. Aggregator / Router
+
+* HTTP via Goliath
+* also opens a UDP socket
+* is drop-in compatible with statsd
+* "Ruby Metrics":https://github.com/johnewart/ruby-metrics for accumulation
+  - ATTN: does this allow for namespacing?
+
+* drops packets but doesn't fail if Graphite is missing
+* drops packets but doesn't fail if MongoDB is missing
+
+* 
+  
+h3. Components
+
+h4. client libraries:
+
+<pre>
+                        UDP	HTTP    facts   metrics 
+  ruby eventmachine     y       y       y       y       
+  ruby stdlib-only      y                       y       
+  ruby faraday          n       y       y       y       
+  java                    ?     y       y       y       
+  curl (shell)          n       y       y       y       
+</pre>
+
+h4. backend targets:
+
+* Graphite
+* MongoDB
+
+h4. integrations
+
+Integrations can
+* send to a
+* store some limited
+
+* goliath: statsd_middleware and statsd_plugin. 
+* ATTN: rack:  ???
+* ATTN: rails: ???
+
+QUESTIONS: 
+* ATTN: do we have to worry about memory use?
+* ATTN: idempotency
+* ATTN: make it easy to include, or ignore:
+  - machine info
+  - deploy info
+
+
+h2. Notes
+
+h3. When to use HTTP vs UDP
+
+h4. HTTP is Connectionful
+
+HTTP is connectionful:
+* you get acknowledgement that a metric was recorded (this is good).
+* if the network is down, your code will break (this is bad). (Well, usually. For some accounting and auditing metrics one might rather serve nothing at all than something unrecorded. Brocephalus doesn't address this use case.)
+
+h4. UDP has Packet Size limitations
+
+If you're using UDP for facts, you need to be *very* careful about payload size.
+
+From the "EventMachine docs":http://eventmachine.rubyforge.org/EventMachine/Connection.html#M000298
+bq.  You may not send an arbitrarily-large data packet because your operating system will enforce a platform-specific limit on the size of the outbound packet. (Your kernel will respond in a platform-specific way if you send an overlarge packet: some will send a truncated packet, some will complain, and some will silently drop your request). On LANs, it’s usually OK to send datagrams up to about 4000 bytes in length, but to be really safe, send messages smaller than the Ethernet-packet size (typically about 1400 bytes). Some very restrictive WANs will either drop or truncate packets larger than about 500 bytes.
