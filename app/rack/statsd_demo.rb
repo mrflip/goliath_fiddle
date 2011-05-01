@@ -5,7 +5,6 @@ $: << File.dirname(__FILE__)+'/../../lib'
 require 'goliath'
 require 'goliath/plugins/statsd_logger'
 require 'goliath/rack/statsd_middleware'
-require 'gorillib/logger/log'
 
 # Counting: gorets:1|c       # Add 1 to the "gorets" bucket. It stays in memory until the flush interval
 # Timing:   glork:320|ms     # The glork took 320ms to complete this time. StatsD figures out 90th percentile, average (mean), lower and upper bounds for the flush interval.
