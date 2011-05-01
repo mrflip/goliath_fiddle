@@ -48,8 +48,16 @@ h3. Aggregator / Router
 * drops packets but doesn't fail if Graphite is missing
 * drops packets but doesn't fail if MongoDB is missing
 
-* 
-  
+
+
+* PUT /_stats/meter?name={name.of.stat}&incr={num}
+* PUT /_stats/counter?name={name.of.stat}&incr={num}
+
+h4. GET /_stats/instrument?name.of.stat=value
+
+
+
+
 h3. Components
 
 h4. client libraries:

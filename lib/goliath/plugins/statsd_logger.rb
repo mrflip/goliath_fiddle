@@ -13,7 +13,6 @@ module Goliath
         @host   = options[:host] || DEFAULT_HOST
         @port   = options[:port] || DEFAULT_PORT
         @logger = options[:logger] || Logger.new
-        @logger.info ['init', @name, @host, @port]
       end
 
       def name metric=[]
@@ -21,7 +20,6 @@ module Goliath
       end
 
       def count metric, val=1, sampling_frac=nil
-        # p ['count', @name, @host, @port, metric, val, sampling_frac]
         if sampling_frac && (rand < sampling_frac.to_F)
           send_to_statsd "#{name(metric)}:#{val}|c|@#{sampling_frac}"
         else
@@ -36,7 +34,6 @@ module Goliath
     protected
 
       def send_to_statsd metric
-        # @logger.info metric
         send_datagram metric, @host, @port
       end
 
@@ -54,10 +51,7 @@ module Goliath
     #
     class StatsdLogger
       attr_reader :agent
-      DEFAULT_HOST = '127.0.0.1'
-      DEFAULT_PORT = 8125
-      DEFAULT_FRAC = 1.0
-      
+
       # Called by the framework to initialize the plugin
       #
       # @param port [Integer] Unused
@@ -67,9 +61,8 @@ module Goliath
       # @return [Goliath::Plugin::Latency] An instance of the Goliath::Plugin::Latency plugin
       def initialize(port, config, status, logger)
         @status = status
-        @config = config
-        @config[:statsd_logger] ||= {}
-        @logger = logger
+        @config = config[:statsd_logger] || {}
+        @config[:logger] = logger
         
         @last = Time.now.to_f
       end
@@ -89,19 +82,14 @@ module Goliath
 
       # Called automatically to start the plugin
       def run
-        @@agent = StatsdSender.open(@config[:statsd_logger].merge(:logger => @logger))
+        @@agent = StatsdSender.open(@config)
 
         EM.add_periodic_timer(1) do
           @@recent_latency = (Time.now.to_f - @last)
           agent.timing 'reactor.latency', @@recent_latency
-          agent.count  'reactor.ticks'
           @last = Time.now.to_f
         end
       end
     end
-    
   end
 end
-
-
-p __FILE__
