@@ -14,7 +14,7 @@ module Goliath
       end
 
       def call(env)
-        path = env['REQUEST_PATH'].gsub(%r{(.+)/$}, '\1')
+        path = env['PATH_INFO'].gsub(%r{(.+)/$}, '\1')
         info = static_file(path)
         return @app.call(env) unless info
 

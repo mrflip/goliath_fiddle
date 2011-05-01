@@ -31,7 +31,7 @@ end
 
 class RootView < Goliath::SimpleFrontend
   def response(env)
-    path    = env['REQUEST_PATH'].gsub(%r{(.+)/$}, '\1')
+    path    = env['PATH_INFO'].gsub(%r{(.+)/$}, '\1')
     headers = {'X-Responder' => self.class.to_s, 'Content-Type' => 'text/html' }
     body = haml :root, :endpoints => ENDPOINTS
     [200, headers, body]

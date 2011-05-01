@@ -1,4 +1,5 @@
 require 'goliath'
+require 'rack/abstract_format'
 
 #
 # Wait the amount of time given by the 'delay' parameter before responding
@@ -11,6 +12,7 @@ class Sleepy < Goliath::API
   use Goliath::Rack::Render             # auto-negotiate response format
   use Goliath::Rack::ValidationError    # catch and render validation errors
   use Goliath::Rack::Validation::NumericRange, {:key => 'delay', :max => 5.0, :default => 1.5, :as => Float}
+  use Rack::AbstractFormat, 'application/json'
 
   def response(env)
     start = Time.now.utc.to_f
