@@ -56,7 +56,7 @@ class Sleepy < Goliath::API
 protected
 
   def logline env, *args
-    env.logger.debug [self.class, env[:start_time], env[:initial_delay], env[:response_delay], *args].flatten.join("\t")
+    env.logger.debug [self.class, env[:start_time], env[:initial_delay], env[:response_delay], Time.now.to_f - env[:start_time], *args].flatten.join("\t")
   end
 
   def body(env)
@@ -65,6 +65,6 @@ protected
         :response_delay   => env[:response_delay],
         :initial_delay    => env[:initial_delay],
         :actual           => (Time.now.to_f - env[:start_time].to_f) }
-      )+"\n"
+      )
   end
 end

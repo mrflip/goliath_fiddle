@@ -9,7 +9,7 @@ require 'rack/abstract_format'
 # Handles multiple parallel requests -- its EM::Synchrony call allows the
 # reactor to keep spinning.
 #
-class Sleepy < Goliath::API
+class SleepySimple < Goliath::API
   use Goliath::Rack::Params             # parse query & body params
   use Goliath::Rack::Formatters::JSON   # JSON output formatter
   use Goliath::Rack::Render             # auto-negotiate response format
