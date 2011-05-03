@@ -6,6 +6,25 @@ require 'em-synchrony/em-http'
 require 'yajl/json_gem'
 require 'async_aroundware.rb'
 
+#
+# Here's a way to make an asynchronous request in the middleware, and only
+# proceed with the response when both the endpoint and our middleware's
+# responses have completed.
+#
+# To run this, start the 'sleepy.rb' server on port 9002:
+#
+#   ./sleepy.rb -sv -p 9002
+#
+# And then start the async_aroundware_demo_multi.rb server on port 9000:
+#
+#   ./async_aroundware_demo_multi.rb -sv -p 9000
+#
+# Now curl the async_aroundware_demo_multi:
+#
+#    $ time curl  'http://127.0.0.1:9000/?delay_1=1.0&delay_2=1.5'
+#    {"results":{"sleep_2":[1304405129.793657,1.5,1.5003128051757812],"sleep_1":[1304405129.793349,1.0,1.000417947769165]},"errors":{}}
+#
+
 BASE_URL     = 'http://localhost:9002/'
 
 class MyBarrier < Barrier
@@ -17,7 +36,7 @@ class MyBarrier < Barrier
     results = { :results => { :sleep_2 => body }, :errors => {} }
     responses[:callback].each{|name, resp| results[:results][name] = JSON.parse(resp.response) }
     responses[:errback ].each{|name, err|  results[:errors][name]  = err.error     }
-    [status, headers, JSON.pretty_generate(results)]
+    [status, headers, JSON.generate(results)]
   end
 end
 
