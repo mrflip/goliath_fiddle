@@ -29,7 +29,7 @@ require 'yajl/json_gem'
 class SleepyStreaming < Goliath::API
   use Goliath::Rack::Params
   use Rack::AbstractFormat, 'application/json'
-  use Goliath::Rack::Validation::NumericRange, {:key => 'delay',         :default => 2.5, :max => 15.0, :min => 0.0, :as => Float}
+  use Goliath::Rack::Validation::NumericRange, {:key => 'delay', :default => 2.5, :max => 15.0, :min => 0.0, :as => Float}
 
   def response(env)
     env[:delay] = env.params['delay']

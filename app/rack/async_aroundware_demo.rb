@@ -104,7 +104,7 @@ class AsyncAroundwareDemo < Goliath::API
   use Goliath::Rack::Validation::NumericRange, {:key => 'delay_1', :default => 1.0, :max => 5.0, :min => 0.0, :as => Float}
   use Goliath::Rack::Validation::NumericRange, {:key => 'delay_2', :default => 0.5, :max => 5.0, :min => 0.0, :as => Float}
   #
-  # use AsyncAroundwareWithCallback
+  use AsyncAroundwareWithCallback
 
   def response(env)
     logline env, 'req2 beg'
