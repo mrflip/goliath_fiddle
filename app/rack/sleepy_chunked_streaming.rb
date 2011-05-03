@@ -67,6 +67,6 @@ protected
   end
 
   def logline env, *args
-    env.logger.debug "timer #{env[:start_time]} [#{env[:delay]}, #{env[:initial_delay]}]: #{args.join("\t")}"
+    env.logger.debug( "timer\t%15.4f\t%7.5f\t%3.2f-%3.2f:\t%s" % [env[:start_time], (Time.now.to_f - env[:start_time]), env[:delay], env[:initial_delay], args.join("\t")])
   end
 end
