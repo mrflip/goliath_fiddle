@@ -115,37 +115,3 @@ class AsyncAroundwareDemo < Goliath::API
   end
 end
 
-
-class EM::Synchrony::MultiWithLogging < EM::Synchrony::Multi
-  include Logjammin
-
-  def initialize env
-    @env = env
-    super()
-  end
-
-  def add(name, conn)
-    fiber = Fiber.current
-    conn.callback { logline(@env, 'mcb  success') ; @responses[:callback][name] = conn; check_progress(fiber) }
-    conn.errback  { logline(@env, 'mcb  error')   ; @responses[:errback][name]  = conn; check_progress(fiber) }
-    @requests.push(conn)
-  end
-
-  def finished?
-    fin = super
-    logline(@env, 'finished?', fin) ;
-    fin
-  end
-
-  def perform
-    logline(@env, 'perform') ;
-    super
-  end
-
-protected
-
-  def check_progress(fiber)
-    logline(@env, 'check prog', fiber.alive?, fiber != Fiber.current, fiber.object_id, Fiber.current.object_id)
-    super
-  end
-end
