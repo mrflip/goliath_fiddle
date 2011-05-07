@@ -54,3 +54,5 @@ vendor/bin
 .bundle
 .sass-cache
 vendor/goliath
+lib/goliath
+lib/goliath.rb

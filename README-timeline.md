@@ -21,7 +21,7 @@
 2. When the connection receives data, it dispatches it to the parser.
 3. parser `on_headers_complete`: fires when the parser has seen a full header block. This constructs a new `Goliath::Request`, asks it to adopt and parse the headers, and enqueues it onto the tail of `@requests`.
 4. parser `on_body`: fires when a chunk of body rolls in, passes it to the head of `requests` to parse.
-5. parser `on_message_complete`: fires when the request body is complete. This dequeues the head of `@requests`. If there is no `@current` request, make that the @current request and invoke its #succeed callback; otherwise, enqueue it onto the `@pending` queue. Lastly, invokes the request's process method.
+5. parser `on_message_complete`: fires when the request body is complete. This dequeues the head of `@requests`. If there is no `@current` request, make that the @current request and invoke its #succeed callback; otherwise, enqueue it onto the `@pending` queue. Lastly, invokes the request's `process` method.
 6. connection `terminate_request`: invoked by the request (on stream_close or in post_process) or on an HTTP parser error.
 
 ### Within a request
