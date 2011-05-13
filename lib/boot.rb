@@ -1,4 +1,11 @@
-RACK_ENV = ENV["RACK_ENV"] ||= "development" unless defined? RACK_ENV
+if defined? RACK_ENV then true #pass
+elsif (idx = (ARGV.index('-e') || ARGV.index('--environment')))
+  RACK_ENV = { 'prod' => 'production', 'dev' => 'development', 'stag' => 'staging'}[ARGV[idx+1]] || ARGV[idx+1]
+else
+  RACK_ENV = ENV["RACK_ENV"] || "development"
+end
+ENV["RACK_ENV"] = RACK_ENV
+
 module Goliath
   Goliath::ROOT_DIR = File.expand_path(File.join(File.dirname(__FILE__), '..')) unless defined?(Goliath::ROOT_DIR)
   def self.root_path *dirs
@@ -6,46 +13,40 @@ module Goliath
   end
 end
 $LOAD_PATH.unshift(Goliath.root_path("lib")) unless $LOAD_PATH.include?(Goliath.root_path("lib"))
-is_production = !!ENV['GEM_STRICT']
+$LOAD_PATH.unshift(Goliath.root_path("app")) unless $LOAD_PATH.include?(Goliath.root_path("app"))
+is_production = (!!ENV['GEM_STRICT']) || (RACK_ENV == 'production') || (RACK_ENV == 'staging')
+
+def try_or_exec_bootstrap try_bootstrap=true, &block
+  if try_bootstrap && (not block.call)
+    cmd = Goliath.root_path("config/bootstrap.rb")
+    warn "WARN The gem environment is out-of-date or has yet to be bootstrapped."
+    warn "     Runnning '#{cmd.join(' ')} --local' to remedy this situation. "
+    warn "     if you get an error about 'rake' or somesuch not installed, "
+    warn "     run #{cmd} explicitly (without the --local flag)."
+    system cmd, "--local"
+  end
+  if not block.call
+    warn "FAIL The gem environment is out-of-date. Run 'bundle install' explicitly and then retry"
+    fail "gem environment not configued"
+  end
+end
 
 if is_production
-  # Verify the environment has been bootstrapped by checking that the
-  # .bundle/loadpath file exists.
-  if !File.exist?(Goliath.root_path(".bundle/loadpath"))
-    warn "WARN The gem environment is out-of-date or has yet to be bootstrapped."
-    warn "     Run config/bootstrap.rb to remedy this situation."
-    fail "gem environment not configued"
+  # Verify the environment has been bootstrapped by checking that the .bundle/loadpath file exists.
+  try_or_exec_bootstrap(false) do
+    File.exist?(Goliath.root_path(".bundle/loadpath"))
   end
 else
   # Run a more exhaustive bootstrap check in non-production environments by making
   # sure the Gemfile matches the .bundle/loadpath file checksum.
-  #
-  # Verify the environment has been bootstrapped by checking that the
-  # .bundle/loadpath file exists.
-  if !File.exist?(Goliath.root_path(".bundle/loadpath"))
-    warn "WARN The gem environment is out-of-date or has yet to be bootstrapped."
-    warn "     Runnning #{Goliath.root_path("config/bootstrap.rb")} to remedy this situation..."
-    system Goliath.root_path("config/bootstrap.rb --local")
-
-    if !File.exist?(Goliath.root_path(".bundle/loadpath"))
-      warn "WARN The gem environment is STILL out-of-date."
-      warn "     Please contact your network administrator."
-      fail "gem environment not configued"
-    end
+  
+  # Verify the environment has been bootstrapped by checking that the .bundle/loadpath file exists.
+  try_or_exec_bootstrap do
+    File.exist?(Goliath.root_path(".bundle/loadpath"))
   end
-
-  checksum = File.read(Goliath.root_path(".bundle/checksum")).to_i rescue nil
-  if `cksum <'#{Goliath.root_path}/Gemfile'`.to_i != checksum
-    warn "WARN The gem environment is out-of-date or has yet to be bootstrapped."
-    warn "     Runnning config/bootstrap.rb to remedy this situation..."
-    system Goliath.root_path("config/bootstrap.rb --local")
-
+  try_or_exec_bootstrap do
     checksum = File.read(Goliath.root_path(".bundle/checksum")).to_i rescue nil
-    if `cksum <'#{Goliath.root_path}/Gemfile'`.to_i != checksum
-      warn "WARN The gem environment is STILL out-of-date."
-      warn "     Please contact your network administrator."
-      fail "gem environment not configued"
-    end
+    `cksum <'#{Goliath.root_path}/Gemfile'`.to_i == checksum
   end
 end
 
