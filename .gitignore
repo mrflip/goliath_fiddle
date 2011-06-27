@@ -49,10 +49,11 @@ public/system/*
 public/stylesheets/style.css
 public/stylesheets/handheld.css
 
-vendor/gems
-vendor/bin
-.bundle
 .sass-cache
-vendor/goliath
+.vendor
 lib/goliath
 lib/goliath.rb
+
+.vendor
+.bundle
+Gemfile.lock

@@ -1,0 +1,87 @@
+
+user            --> reactor: GET /foo
+activate reactor
+reactor         -> request: incoming!
+
+activate        request
+note over request, req_cb
+  make async_cb to 
+  return result
+end note
+request         -> mw: @app.call
+
+activate        mw
+note over mw, mw_cb
+  replace async_cb
+  w/ own proc
+end note
+mw              -> endpoint: @app.call
+
+activate        endpoint
+note over endpoint, response_fiber
+  create response_fiber
+  w/ access to env
+end note
+endpoint        --> response_fiber: fiber.resume
+endpoint        -> request: AsyncResponse
+deactivate      endpoint
+deactivate      request
+request         -> reactor: done
+reactor         -> response_fiber: your turn
+
+
+
+alt response fiber
+activate        response_fiber
+
+response_fiber  -> response: endpoint.response
+activate        response
+
+note over response
+  ...do
+  stuff...
+end note
+note over response, response_cb
+  make response_cb
+end note
+response        --> network: ext request
+response        -> reactor: fiber.yield
+end alt
+
+note over reactor
+  (...other 
+  requests 
+  happen...)
+end note
+network         --> reactor: OS tells reactor ext request is done, returning [result]
+
+reactor         -> response_cb: response_cb.succeed [result]
+activate        response_cb
+response_cb     -> response: fiber.resume [result]
+deactivate      response_cb
+
+alt response fiber
+note over response
+  ...do stuff
+  with resp...
+end note 
+
+response        -> response_fiber: return [st,h,body]
+deactivate      response
+response_fiber  -> mw_cb: async_cb.call(s,h,b)
+
+mw_cb           -> mw: pp(s,h,b)
+mw              -> mw_cb: [s,h,b]
+deactivate      mw
+
+mw_cb           -> req_cb: async_cb.call(s,h,b)
+req_cb          -> user: send [s,h,b] to user
+end alt
+
+response_fiber  -> reactor: response_fiber done
+deactivate      response_fiber
+
+note over reactor
+  (...life 
+  goes on...)
+end note
