@@ -56,4 +56,4 @@ lib/goliath.rb
 
 .vendor
 .bundle
-Gemfile.lock
+
